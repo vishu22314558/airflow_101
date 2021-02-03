@@ -1,0 +1,33 @@
+Curl -LfO 'http://apache-airflow-docs.s3-website.eu-central-1.amazonaws.com/docs/apache-airflow/latest/docker-compose.yaml'
+
+mkdir ./dags ./logs ./plugins
+
+ENV - Permission (Group and user permission are same between host and container)
+>echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" >.env
+
+initialize the Airflow instance with Airflow service airflow init 
+(Will create user airflow / airflow )
+docker-compose up airflow-init
+
+Create all Service 
+docker-compose up 
+
+
+#check Service 
+docker ps 
+ 
+# interact with airflow cmd interface (use any container id )
+docker exec 98f7ba0d2b04 airflow version
+
+#intract with API 
+>curl -X GET "http://localhost:8080/api/v1/dags"
+If we get <Unauthenticated>
+    .> got to docker-compose.yaml. -- create new environment variable
+		AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'  
+
+#restart Docker 
+Docker-compose down && docker-compose up
+
+# now pass user name and password with API 
+
+curl -X GET --user "airflow:airflow" "http://localhost:8080/api/v1/dags"
